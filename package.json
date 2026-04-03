@@ -1,0 +1,12 @@
+{
+  "name": "trmnl-agenda-plugin",
+  "version": "1.0.0",
+  "description": "TRMNL plugin that displays today and tomorrow's events from an .ics calendar file",
+  "type": "module",
+  "scripts": {
+    "push": "node src/push.js"
+  },
+  "dependencies": {
+    "ical.js": "^2.1.0"
+  }
+}
