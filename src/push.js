@@ -122,7 +122,7 @@ function parseEvents(icsText, tzOffsetHours) {
 
   const formatDate = (date) => {
     const local = getLocalDate(date, tzOffsetHours);
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return `${days[local.getUTCDay()]}, ${months[local.getUTCMonth()]} ${local.getUTCDate()}`;
   };

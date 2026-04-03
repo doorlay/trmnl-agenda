@@ -1,17 +1,16 @@
 <div class="screen">
   <div class="view view--half_vertical">
-    <div class="layout layout--col gap--small">
+    <div class="layout layout--col gap--small" style="justify-content: flex-start;">
       <div class="flex flex--col gap--xsmall">
         <div class="flex flex--row flex--center-y gap--small mb--small">
           <span class="title title--small">{{ today_date }}</span>
           <div class="divider grow"></div>
         </div>
         {% if today_events.size > 0 %}
-          {% for event in today_events limit: 4 %}
+          {% for event in today_events limit: 3 %}
             <div class="item">
-              <div class="meta"></div>
-              <div class="content flex flex--row flex--center-y gap--medium">
-                <span class="label label--small" style="min-width: 68px;">{{ event.time }}</span>
+              <div class="content flex flex--row flex--center-y gap--small">
+                <span class="label label--small" style="min-width: 62px;">{{ event.time }}</span>
                 <span class="description" data-clamp="1">{{ event.title }}</span>
               </div>
             </div>
@@ -28,9 +27,8 @@
         {% if tomorrow_events.size > 0 %}
           {% for event in tomorrow_events limit: 3 %}
             <div class="item">
-              <div class="meta"></div>
-              <div class="content flex flex--row flex--center-y gap--medium">
-                <span class="label label--small" style="min-width: 68px;">{{ event.time }}</span>
+              <div class="content flex flex--row flex--center-y gap--small">
+                <span class="label label--small" style="min-width: 62px;">{{ event.time }}</span>
                 <span class="description" data-clamp="1">{{ event.title }}</span>
               </div>
             </div>
