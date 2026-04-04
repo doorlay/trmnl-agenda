@@ -1,42 +1,157 @@
-<div class="screen">
-  <div class="view view--half_vertical" style="justify-content: flex-start; align-items: stretch;">
-    <div class="layout layout--col gap--small">
-      <div class="flex flex--col gap--xsmall">
-        <div class="flex flex--row flex--center-y gap--small mb--small">
-          <span class="title title--small">{{ today_date }}</span>
-          <div class="divider grow"></div>
-        </div>
+<div class="layout layout--col layout--top gap--large">
+  
+  <div class="w-full">
+    <span class="label label--large">{{ today_date }}</span>
+    <table class="table table--base">
+      <thead>
+        <tr>
+          <th class="w--80"><span class="label label--small">Event</span></th>
+          <th><span class="label label--small">Time</span></th>
+        </tr>
+      </thead>
+      <tbody>
         {% if today_events.size > 0 %}
-          {% for event in today_events limit: 3 %}
-            <div class="item">
-              <div class="content flex flex--row flex--center-y gap--small">
-                <span class="label label--small" style="min-width: 62px;">{{ event.time }}</span>
-                <span class="description" data-clamp="1">{{ event.title }}</span>
-              </div>
-            </div>
+          {% for event in today_events limit: 4 %}
+          <tr>
+            <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
+            <td><span class="label">{{ event.time }}</span></td>
+          </tr>
           {% endfor %}
         {% else %}
-          <span class="description text--gray-50">No events</span>
+          <tr><td colspan="2" class="text--gray-400 italic">No events today</td></tr>
         {% endif %}
-      </div>
-      <div class="flex flex--col gap--xsmall">
-        <div class="flex flex--row flex--center-y gap--small mb--small">
-          <span class="title title--small">{{ tomorrow_date }}</span>
-          <div class="divider grow"></div>
-        </div>
-        {% if tomorrow_events.size > 0 %}
-          {% for event in tomorrow_events limit: 3 %}
-            <div class="item">
-              <div class="content flex flex--row flex--center-y gap--small">
-                <span class="label label--small" style="min-width: 62px;">{{ event.time }}</span>
-                <span class="description" data-clamp="1">{{ event.title }}</span>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <span class="description text--gray-50">No events</span>
-        {% endif %}
-      </div>
-    </div>
+      </tbody>
+    </table>
   </div>
+
+  <div class="w-full py--small">
+    <div class="divider"></div>
+  </div>
+
+  <div class="w-full">
+    <span class="label label--large">{{ tomorrow_date }}</span>
+    <table class="table table--base">
+      <thead>
+        <tr>
+          <th class="w--80"><span class="label label--small">Event</span></th>
+          <th><span class="label label--small">Time</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if tomorrow_events.size > 0 %}
+          {% for event in tomorrow_events limit: 4 %}
+          <tr>
+            <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
+            <td><span class="label">{{ event.time }}</span></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="2" class="text--gray-400 italic">No events scheduled</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
 </div>
+
+<div class="title_bar">
+  <img class="image" src="https://trmnl.com/images/plugins/trmnl--render.svg">
+  <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
+</div>
+
+<style>
+  /* Keeps the horizontal line crisp */
+  .divider {
+    height: 2px;
+    background-color: #000;
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  /* Prevents the event title from pushing the 'Time' column off-screen */
+  .truncate-line {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+  }
+</style><div class="layout layout--col layout--top gap--large">
+  
+  <div class="w-full">
+    <span class="label label--large">{{ today_date }}</span>
+    <table class="table table--base">
+      <thead>
+        <tr>
+          <th class="w--80"><span class="label label--small">Event</span></th>
+          <th><span class="label label--small">Time</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if today_events.size > 0 %}
+          {% for event in today_events limit: 4 %}
+          <tr>
+            <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
+            <td><span class="label">{{ event.time }}</span></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="2" class="text--gray-400 italic">No events today</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="w-full py--small">
+    <div class="divider"></div>
+  </div>
+
+  <div class="w-full">
+    <span class="label label--large">{{ tomorrow_date }}</span>
+    <table class="table table--base">
+      <thead>
+        <tr>
+          <th class="w--80"><span class="label label--small">Event</span></th>
+          <th><span class="label label--small">Time</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if tomorrow_events.size > 0 %}
+          {% for event in tomorrow_events limit: 4 %}
+          <tr>
+            <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
+            <td><span class="label">{{ event.time }}</span></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="2" class="text--gray-400 italic">No events scheduled</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="title_bar">
+  <img class="image" src="https://trmnl.com/images/plugins/trmnl--render.svg">
+  <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
+</div>
+
+<style>
+  /* Keeps the horizontal line crisp */
+  .divider {
+    height: 2px;
+    background-color: #000;
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  /* Prevents the event title from pushing the 'Time' column off-screen */
+  .truncate-line {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+  }
+</style>
