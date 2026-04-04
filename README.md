@@ -1,32 +1,31 @@
 ### TRMNL Agenda Plugin
 
-A webhook-based TRMNL plugin that displays today's and tomorrow's calendar events from an .ics file. Designed to run on a Raspberry Pias a cron job. 
+A webhook-based TRMNL plugin that displays today's and tomorrow's calendar events from an .ics file. Designed to run on a server as a cron job. 
 
 ### Setup 
 
 *Prerequisites*
 - [Node.js](https://nodejs.org/) v18+ installed on the server this will run on
 - A TRMNL device with [Developer Edition](https://help.trmnl.com/en/articles/9510536-private-plugins) enabled
-- A calendar .ics URL (Google Calendar, iCloud, Outlook, etc.)
+- A calendar .ics URL
 
 *TRMNL*
 1. Go to your [TRMNL dashboard](https://usetrmnl.com)
-2. Create a new **Private Plugin** with the **Webhook** data strategy
+2. Create a new Private Plugin with the Webhook data strategy
 3. Paste the contents of each file in `templates/` into the corresponding layout field (no support for full and half horizontal at the moment):
    - `templates/half_vertical.liquid` → Half Vertical layout
    - `templates/quadrant.liquid` → Quadrant layout
-4. Save the plugin and copy the **Plugin UUID** from the plugin settings
+4. Save the plugin and copy the Plugin UUID from the plugin settings
 
 *Server*
-Clone this repo, then run:
+1. Clone this repo and run:
 ```bash
-cd trmnl-plugins
+cd trmnl-agenda
 npm install
 cp .env.example .env
 ```
-and fill in your environment variables.
-
-Run the script once to verify everything works:
+2. Fill in your environment variables in .env.
+3. Run the script once to verify everything works:
 ```bash
 npm run push
 ```
@@ -40,7 +39,7 @@ Pushing to https://usetrmnl.com/api/custom_plugins/...
 Done! Events pushed to TRMNL.
 ```
 
-Run the setup script to install a cron job (defaults to every 15 minutes):
+4. Run the setup script to install a cron job (defaults to every 15 minutes):
 
 ```bash
 chmod +x scripts/setup-cron.sh
