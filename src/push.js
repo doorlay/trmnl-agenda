@@ -57,54 +57,58 @@ function parseEvents(icsText, tzOffsetHours) {
   const todayEvents = [];
   const tomorrowEvents = [];
 
+  const addOccurrence = (summary, startJS, endJS, isAllDay) => {
+    const startKey = dateKey(startJS, tzOffsetHours);
+    // DTEND is exclusive for all-day events; back off 1ms to get the last active day
+    const lastKey = isAllDay
+      ? dateKey(new Date(endJS.getTime() - 1), tzOffsetHours)
+      : dateKey(endJS, tzOffsetHours);
+
+    for (const targetKey of [todayKey, tomorrowKey]) {
+      if (targetKey < startKey || targetKey > lastKey) continue;
+      const showAsAllDay = isAllDay || targetKey !== startKey;
+      const entry = {
+        title: summary || "(No title)",
+        time: showAsAllDay ? "All day" : formatTime(startJS, tzOffsetHours),
+        sort: showAsAllDay ? -1 : startJS.getTime(),
+      };
+      const bucket = targetKey === todayKey ? todayEvents : tomorrowEvents;
+      if (!bucket.some((e) => e.title === entry.title && e.time === entry.time)) {
+        bucket.push(entry);
+      }
+    }
+  };
+
+  // One-off events
   for (const vevent of vevents) {
     try {
       const event = new ICAL.Event(vevent);
-      const start = event.startDate.toJSDate();
-      const key = dateKey(start, tzOffsetHours);
-      const allDay = event.startDate.isDate;
-
-      const entry = {
-        title: event.summary || "(No title)",
-        time: allDay ? "All day" : formatTime(start, tzOffsetHours),
-        sort: allDay ? -1 : start.getTime(),
-      };
-
-      if (key === todayKey) todayEvents.push(entry);
-      else if (key === tomorrowKey) tomorrowEvents.push(entry);
+      if (event.isRecurring()) continue;
+      const startJS = event.startDate.toJSDate();
+      const endJS = event.endDate ? event.endDate.toJSDate() : startJS;
+      addOccurrence(event.summary, startJS, endJS, event.startDate.isDate);
     } catch (e) {
       console.warn("Skipping unparseable event:", e.message);
     }
   }
 
-  // Handle recurring events
+  // Recurring events
   for (const vevent of vevents) {
     try {
       const event = new ICAL.Event(vevent);
       if (!event.isRecurring()) continue;
 
+      const durationMs = event.duration ? event.duration.toSeconds() * 1000 : 0;
+      const isAllDay = event.startDate.isDate;
+
       const iter = event.iterator();
       let next = iter.next();
       let safety = 0;
       while (next && safety < 10000) {
-        const js = next.toJSDate();
-        const key = dateKey(js, tzOffsetHours);
-
-        if (key > tomorrowKey) break;
-
-        const allDay = next.isDate;
-        const entry = {
-          title: event.summary || "(No title)",
-          time: allDay ? "All day" : formatTime(js, tzOffsetHours),
-          sort: allDay ? -1 : js.getTime(),
-        };
-
-        if (key === todayKey && !todayEvents.some((e) => e.title === entry.title && e.time === entry.time)) {
-          todayEvents.push(entry);
-        } else if (key === tomorrowKey && !tomorrowEvents.some((e) => e.title === entry.title && e.time === entry.time)) {
-          tomorrowEvents.push(entry);
-        }
-
+        const startJS = next.toJSDate();
+        if (dateKey(startJS, tzOffsetHours) > tomorrowKey) break;
+        const endJS = new Date(startJS.getTime() + durationMs);
+        addOccurrence(event.summary, startJS, endJS, isAllDay);
         next = iter.next();
         safety++;
       }
