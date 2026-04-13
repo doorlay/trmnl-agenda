@@ -71,6 +71,8 @@ function parseEvents(icsText, tzOffsetHours) {
         title: summary || "(No title)",
         time: showAsAllDay ? "All day" : formatTime(startJS, tzOffsetHours),
         sort: showAsAllDay ? -1 : startJS.getTime(),
+        all_day: showAsAllDay,
+        end_ms: showAsAllDay ? null : endJS.getTime(),
       };
       const bucket = targetKey === todayKey ? todayEvents : tomorrowEvents;
       if (!bucket.some((e) => e.title === entry.title && e.time === entry.time)) {
@@ -121,8 +123,33 @@ function parseEvents(icsText, tzOffsetHours) {
   todayEvents.sort(sort);
   tomorrowEvents.sort(sort);
 
-  // Remove sort key from output
-  const clean = ({ title, time }) => ({ title, time });
+  // Split today into all-day / past / active and insert the "now" marker
+  const nowMs = now.getTime();
+  const todayAllDay = [];
+  const todayPast = [];
+  const todayActive = [];
+  for (const e of todayEvents) {
+    if (e.all_day) {
+      todayAllDay.push(e);
+    } else if (e.end_ms !== null && e.end_ms <= nowMs) {
+      e.past = true;
+      todayPast.push(e);
+    } else {
+      todayActive.push(e);
+    }
+  }
+  // Keep only the most recent past event as context
+  const recentPast = todayPast.length > 0 ? [todayPast[todayPast.length - 1]] : [];
+  const todayList = [...todayAllDay, ...recentPast];
+  if (todayPast.length > 0 || todayActive.length > 0) {
+    todayList.push({ is_marker: true });
+  }
+  todayList.push(...todayActive);
+
+  const cleanEvent = (e) => {
+    if (e.is_marker) return { is_marker: true };
+    return { title: e.title, time: e.time, past: !!e.past };
+  };
 
   const formatDate = (date) => {
     const local = getLocalDate(date, tzOffsetHours);
@@ -134,8 +161,8 @@ function parseEvents(icsText, tzOffsetHours) {
   return {
     today_date: formatDate(now),
     tomorrow_date: formatDate(tomorrowDate),
-    today_events: todayEvents.map(clean),
-    tomorrow_events: tomorrowEvents.map(clean),
+    today_events: todayList.map(cleanEvent),
+    tomorrow_events: tomorrowEvents.map(cleanEvent),
   };
 }
 

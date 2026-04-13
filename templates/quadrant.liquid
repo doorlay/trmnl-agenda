@@ -2,7 +2,7 @@
   
   <div class="w-full">
     <span class="label label--large">{{ today_date }}</span>
-    <table class="table table--condensed">
+    <table class="table table--condensed" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
           <th class="w--80"><span class="label label--small">Event</span></th>
@@ -11,11 +11,15 @@
       </thead>
       <tbody>
         {% if today_events.size > 0 %}
-          {% for event in today_events limit: 4 %}
-          <tr>
-            <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
-            <td><span class="label">{{ event.time }}</span></td>
-          </tr>
+          {% for event in today_events limit: 5 %}
+            {% if event.is_marker %}
+              <tr><td colspan="2" style="padding: 2px 0;"><div class="now-marker"></div></td></tr>
+            {% else %}
+              <tr {% if event.past %}style="opacity: 0.4;"{% endif %}>
+                <td><span class="title title--small truncate-line">{{ event.title }}</span></td>
+                <td><span class="label">{{ event.time }}</span></td>
+              </tr>
+            {% endif %}
           {% endfor %}
         {% else %}
           <tr><td colspan="2" class="text--gray-400 italic">No events today</td></tr>
@@ -30,7 +34,7 @@
 
   <div class="w-full">
     <span class="label label--large">{{ tomorrow_date }}</span>
-    <table class="table table--condensed">
+    <table class="table table--condensed" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
           <th class="w--80"><span class="label label--small">Event</span></th>
@@ -75,5 +79,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 260px;
+  }
+
+  /* "You are here" marker showing current position in the day */
+  .now-marker {
+    height: 3px;
+    background-color: #888;
+    width: 100%;
   }
 </style>
