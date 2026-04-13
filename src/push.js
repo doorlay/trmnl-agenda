@@ -123,15 +123,13 @@ function parseEvents(icsText, tzOffsetHours) {
   todayEvents.sort(sort);
   tomorrowEvents.sort(sort);
 
-  // Mark past events on today so the template can gray them out
+  // Drop events that have already ended from today
   const nowMs = now.getTime();
-  for (const e of todayEvents) {
-    if (!e.all_day && e.end_ms !== null && e.end_ms <= nowMs) {
-      e.past = true;
-    }
-  }
+  const todayUpcoming = todayEvents.filter(
+    (e) => e.all_day || e.end_ms === null || e.end_ms > nowMs
+  );
 
-  const cleanEvent = (e) => ({ title: e.title, time: e.time, past: !!e.past });
+  const cleanEvent = (e) => ({ title: e.title, time: e.time });
 
   const formatDate = (date) => {
     const local = getLocalDate(date, tzOffsetHours);
@@ -143,7 +141,7 @@ function parseEvents(icsText, tzOffsetHours) {
   return {
     today_date: formatDate(now),
     tomorrow_date: formatDate(tomorrowDate),
-    today_events: todayEvents.map(cleanEvent),
+    today_events: todayUpcoming.map(cleanEvent),
     tomorrow_events: tomorrowEvents.map(cleanEvent),
   };
 }
