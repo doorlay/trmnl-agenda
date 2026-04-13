@@ -123,33 +123,15 @@ function parseEvents(icsText, tzOffsetHours) {
   todayEvents.sort(sort);
   tomorrowEvents.sort(sort);
 
-  // Split today into all-day / past / active and insert the "now" marker
+  // Mark past events on today so the template can gray them out
   const nowMs = now.getTime();
-  const todayAllDay = [];
-  const todayPast = [];
-  const todayActive = [];
   for (const e of todayEvents) {
-    if (e.all_day) {
-      todayAllDay.push(e);
-    } else if (e.end_ms !== null && e.end_ms <= nowMs) {
+    if (!e.all_day && e.end_ms !== null && e.end_ms <= nowMs) {
       e.past = true;
-      todayPast.push(e);
-    } else {
-      todayActive.push(e);
     }
   }
-  // Keep only the most recent past event as context
-  const recentPast = todayPast.length > 0 ? [todayPast[todayPast.length - 1]] : [];
-  const todayList = [...todayAllDay, ...recentPast];
-  if (todayPast.length > 0 || todayActive.length > 0) {
-    todayList.push({ is_marker: true });
-  }
-  todayList.push(...todayActive);
 
-  const cleanEvent = (e) => {
-    if (e.is_marker) return { is_marker: true };
-    return { title: e.title, time: e.time, past: !!e.past };
-  };
+  const cleanEvent = (e) => ({ title: e.title, time: e.time, past: !!e.past });
 
   const formatDate = (date) => {
     const local = getLocalDate(date, tzOffsetHours);
@@ -161,7 +143,7 @@ function parseEvents(icsText, tzOffsetHours) {
   return {
     today_date: formatDate(now),
     tomorrow_date: formatDate(tomorrowDate),
-    today_events: todayList.map(cleanEvent),
+    today_events: todayEvents.map(cleanEvent),
     tomorrow_events: tomorrowEvents.map(cleanEvent),
   };
 }
