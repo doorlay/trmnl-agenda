@@ -71,8 +71,6 @@ function parseEvents(icsText, tzOffsetHours) {
         title: summary || "(No title)",
         time: showAsAllDay ? "All day" : formatTime(startJS, tzOffsetHours),
         sort: showAsAllDay ? -1 : startJS.getTime(),
-        all_day: showAsAllDay,
-        end_ms: showAsAllDay ? null : endJS.getTime(),
       };
       const bucket = targetKey === todayKey ? todayEvents : tomorrowEvents;
       if (!bucket.some((e) => e.title === entry.title && e.time === entry.time)) {
@@ -123,12 +121,6 @@ function parseEvents(icsText, tzOffsetHours) {
   todayEvents.sort(sort);
   tomorrowEvents.sort(sort);
 
-  // Drop events that have already ended from today
-  const nowMs = now.getTime();
-  const todayUpcoming = todayEvents.filter(
-    (e) => e.all_day || e.end_ms === null || e.end_ms > nowMs
-  );
-
   const cleanEvent = (e) => ({ title: e.title, time: e.time });
 
   const formatDate = (date) => {
@@ -141,7 +133,7 @@ function parseEvents(icsText, tzOffsetHours) {
   return {
     today_date: formatDate(now),
     tomorrow_date: formatDate(tomorrowDate),
-    today_events: todayUpcoming.map(cleanEvent),
+    today_events: todayEvents.map(cleanEvent),
     tomorrow_events: tomorrowEvents.map(cleanEvent),
   };
 }
