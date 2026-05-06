@@ -59,8 +59,9 @@ function parseEvents(icsText, tzOffsetHours) {
 
   const addOccurrence = (summary, startJS, endJS, isAllDay) => {
     const startKey = dateKey(startJS, tzOffsetHours);
-    // DTEND is exclusive for all-day events; back off 1ms to get the last active day
-    const lastKey = isAllDay
+    // DTEND is the moment the event ends; back off 1ms so an event ending at
+    // exactly midnight stays on the prior day instead of bleeding into the next.
+    const lastKey = endJS.getTime() > startJS.getTime()
       ? dateKey(new Date(endJS.getTime() - 1), tzOffsetHours)
       : dateKey(endJS, tzOffsetHours);
 
